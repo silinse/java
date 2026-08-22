@@ -72,3 +72,24 @@ char \u0000
 Object null  
 String null
 
+## collections
+
+### arrayList
+```
+List<String> names = new ArrayList<>();
+
+// adds name to the list
+names.add("John");
+names.add("Alice");
+names.add("Bob");
+
+// replaces name in position 1
+names.set(1, "Kate");
+
+// inserts name in position 1
+names.add(1, "Mike");
+
+System.out.println(names); // [John, Mike,  Kate, Bob]
+System.out.println(names.get(2)); // Kate
+System.out.println(names.size()); // 4
+```
