@@ -93,3 +93,17 @@ System.out.println(names); // [John, Mike,  Kate, Bob]
 System.out.println(names.get(2)); // Kate
 System.out.println(names.size()); // 4
 ```
+
+### HashMap
+```
+Map<String, Integer> ages = new HashMap<>();
+
+ages.put("John", 30);
+ages.put("Alice", 25);
+ages.put("Bob", 40);
+
+for (Map.Entry<String, Integer> entry : ages.entrySet()) {
+    System.out.println(entry.getKey());
+    System.out.println(entry.getValue());
+}
+```
