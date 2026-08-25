@@ -109,6 +109,8 @@ for (Map.Entry<String, Integer> entry : ages.entrySet()) {
 ```
 
 ## I/O
+
+### simple read/write file
 ```
 Path path = Path.of("message.txt");
 Files.writeString(path, "Hello");
@@ -126,8 +128,58 @@ List<String> lines = Files.readAllLines(path);
 System.out.println(lines.size()); // 3
 System.out.println(lines.get(0)); // John
 System.out.println(lines.get(2)); // Bob
+```
 
+### try with resources
+```
+// try with resources closes them after
 try (BufferedReader reader = Files.newBufferedReader(path)) {
     System.out.println(reader.readLine());
 }
+```
+
+## lambdas
+
+### intermediate operations
+return another Stream, so you can chain them
+```
+filter()
+map()
+sorted()
+distinct()
+```
+
+### terminal operations
+produce a result or perform an action, can't chain them
+```
+count()
+toList()
+forEach()
+```
+
+### removeIf
+expects a Predicate\<T>, returns bookean
+```
+// remove names that starts with an A
+names.removeIf(name -> name.startsWith("A"));
+```
+
+### forEach
+expects a Consumer\<T>, returns void
+```
+// print all
+names.forEach(name -> System.out.println(name);
+```
+
+### stream filter/map
+```
+// gets all even numbers from numbers List  
+List<Integer> result = numbers.stream().filter(number -> number % 2 == 0).toList();
+
+// change list
+List<Integer> result = numbers.stream().map(number -> number * 2).toList();
+
+// with map can change element type
+List<Integer> lengths = names.stream().map(name -> name.length()).toList();
+
 ```
