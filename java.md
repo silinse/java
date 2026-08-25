@@ -107,3 +107,27 @@ for (Map.Entry<String, Integer> entry : ages.entrySet()) {
     System.out.println(entry.getValue());
 }
 ```
+
+## I/O
+```
+Path path = Path.of("message.txt");
+Files.writeString(path, "Hello");
+Files.writeString(path, " World"); // overwrites
+Files.writeString(path, " World", StandardOpenOption.APPEND); // adds
+System.out.println(Files.readString(path));
+
+users.txt contains
+John
+Alice
+Bob
+
+Path path = Path.of("users.txt");
+List<String> lines = Files.readAllLines(path);
+System.out.println(lines.size()); // 3
+System.out.println(lines.get(0)); // John
+System.out.println(lines.get(2)); // Bob
+
+try (BufferedReader reader = Files.newBufferedReader(path)) {
+    System.out.println(reader.readLine());
+}
+```
