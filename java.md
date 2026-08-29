@@ -183,3 +183,122 @@ List<Integer> result = numbers.stream().map(number -> number * 2).toList();
 List<Integer> lengths = names.stream().map(name -> name.length()).toList();
 
 ```
+
+## SQL
+### SELECT
+`SELECT * FROM users`
+
+`SELECT * FROM users WHERE country='Latvia' AND age > 18;`
+
+`SELECT * FROM users WHERE country IN ('Latvia', 'Finland');`
+
+options are ASC and DESC, ASC is default value  
+`SELECT * FROM users ORDER BY age ASC;`
+
+you can use multiple keywords, but they have to be in order
+```
+SELECT ...
+FROM ...
+WHERE ...
+GROUP BY ...
+ORDER BY ...
+```
+
+### INSERT
+values correspond to the columns by position
+```
+INSERT INTO table (column1, column2)
+VALUES (value1, value2);
+```
+
+### UPDATE
+```
+UPDATE users
+SET country = 'Latvia'
+WHERE id = 5; 
+```
+
+### DELETE
+`DELETE FROM users WHERE id = 5;`
+
+### aggregate functions
+```
+COUNT(...)
+SUM(...)
+AVG(...)
+MIN(...)
+MAX(...)
+
+returns the number of rows:
+SELECT COUNT(*) FROM users;
+
+returns average age
+SELECT AVG(age) FROM users;
+```
+
+### GROUP BY
+```
+SELECT country, COUNT(*)
+FROM users
+GROUP BY country
+
+Latvia    | 2
+Estonia   | 1
+Finland   | 1
+
+SELECT country, AVG(age)
+FROM users
+GROUP BY country;
+
+SELECT country, COUNT(*)
+FROM users
+GROUP BY country
+ORDER BY COUNT(*) DESC;
+```
+
+## JDBC
+### Connection
+```
+// to close resources, there should be try() around them
+// each resource is closed in reverse order of createion
+try(
+    Connection connection = DriverManager.getConnection(
+            "jdbc:postgresql://localhost:5432/mydb",
+            "username",
+            "password"
+    );
+    
+    String sql = "SELECT * FROM users";
+    
+    PreparedStatement statement = connection.prepareStatement(sql);
+    
+    ResultSet result = statement.executeQuery();
+    ){
+
+    while (result.next()) {
+        String name = result.getString("name");
+        int age = result.getInt("age");
+    
+        System.out.println(name + " - " + age);
+    }
+}
+
+// the getter should correspond to the Java type you want:
+result.getString("name");
+result.getInt("age");
+result.getLong("id");
+result.getDouble("price");
+result.getBoolean("active");
+
+String sql = "SELECT * FROM users WHERE country = ? AND age >= ?";
+PreparedStatement statement = connection.prepareStatement(sql);
+statement.setString(1, "Latvia");
+statement.setInt(2, 30);
+
+// for SELECT
+statement.executeQuery();
+
+// for operations that modify rows, such as INSERT, UPDATE, DELETE
+// returns affected rows
+int affectedRows = statement.executeUpdate();
+```
