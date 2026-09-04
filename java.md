@@ -302,3 +302,119 @@ statement.executeQuery();
 // returns affected rows
 int affectedRows = statement.executeUpdate();
 ```
+
+## JPA
+### example
+```
+@Entity // tells JPA that User is an entity - a class whose objects can correspond to rows stored in a database.
+@Table(name = "app_users")
+public class User {
+
+    @Id // primary key
+    @Column(name = "user_id") // if field does not match column name
+    private Long id;
+
+    @Column(name = "username")
+    private String name;
+
+    private int age;
+}
+```
+
+### relationship
+```
+@Entity
+public class Order {
+
+    @Id
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+}
+
+@Entity
+public class User {
+
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
+}
+```
+
+## threads
+### run, start
+run()   → normal method call on current thread  
+start() → start a new thread, which then executes run()
+```
+public class Main {
+    public static void main(String[] args) {
+
+        Thread worker = new Thread(() -> {
+            System.out.println("Worker");
+        });
+
+        worker.start();
+
+        System.out.println("Main");
+    }
+}
+```
+
+### join
+```
+Thread worker = new Thread(() -> {
+    System.out.println("Worker");
+});
+
+worker.start();
+worker.join(); // asks main thread to wait for worker to finish
+
+System.out.println("Main");
+```
+
+### sleep
+ask current thread to wait 2 seconds  
+`Thread.sleep(2000);`
+
+### executor service
+```
+ExecutorService executor = Executors.newFixedThreadPool(2);
+
+executor.submit(() -> {
+System.out.println("Task 1");
+});
+
+executor.submit(() -> {
+System.out.println("Task 2");
+});
+
+executor.submit(() -> {
+System.out.println("Task 3");
+});
+
+executor.shutdown();
+```
+
+### shutdown vs close
+both allows tasks to finish  
+shutdown - calling thread does not wait
+close - calling thread waits
+
+## networking
+```
+try (Socket socket = new Socket("localhost", 8080);
+     PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+     BufferedReader reader = new BufferedReader(
+             new InputStreamReader(socket.getInputStream()))) {
+
+    writer.println("Hello!");
+
+    String response = reader.readLine();
+
+    System.out.println(response);
+}
+```
