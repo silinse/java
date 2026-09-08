@@ -418,3 +418,200 @@ try (Socket socket = new Socket("localhost", 8080);
     System.out.println(response);
 }
 ```
+
+## Spring Boot + REST
+### Spring Boot
+```
+@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+
+// GET /users/42
+@GetMapping("/users/{id}")
+public String getUser(@PathVariable Long id) {
+    return "User " + id;
+}
+
+// GET /users?country=Latvia
+@GetMapping("/users")
+public String getUsers(@RequestParam String country) {
+    return "Country: " + country;
+}
+```
+
+### POST
+```
+POST /users
+Content-Type: application/json
+
+{
+    "name": "Alice",
+    "age": 25
+}
+```
+```
+@PostMapping("/users")
+public User createUser(@RequestBody User user) {
+    return user;
+}
+```
+```
+public class User {
+    private String name;
+    private int age;
+
+    // getters/setters
+}
+```
+```
+JSON                    Java User object
+
+"name": "Alice"   →     user.name = "Alice"
+"age": 25         →     user.age  = 25
+```
+
+### examples
+controller
+```
+@RestController
+public class UserController {
+
+    private final UserService service;
+
+    public UserController(UserService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        return service.getUser(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+}
+```
+
+service
+```
+@Service
+public class UserService {
+
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
+
+    public Optional<User> getUser(Long id) {
+        return repository.findById(id);
+    }
+}
+```
+
+repository
+```
+public interface UserRepository
+        extends JpaRepository<User, Long> {
+}
+```
+
+### summary
+Spring Boot  
+├── @SpringBootApplication  
+├── Spring-managed beans  
+├── @Service  
+└── dependency injection  
+
+REST  
+├── @RestController  
+├── @GetMapping  
+├── @PostMapping  
+├── @PutMapping  
+├── @DeleteMapping  
+├── @PathVariable  
+├── @RequestParam  
+├── @RequestBody  
+├── GET / POST / PUT / PATCH / DELETE  
+├── HTTP status codes  
+└── ResponseEntity  
+
+Architecture  
+Controller → Service → Repository → Database
+
+## Spring Data + Spring Security 
+### Spring Data JPA
+```
+public interface UserRepository
+        extends JpaRepository<User, Long> {
+}
+// interface is empty, we still get:
+repository.findById(5L);
+repository.findAll();
+repository.save(user);
+repository.delete(user);
+repository.count();
+```
+
+### keywords in method names
+```
+findByName(String name)
+findByCountry(String country)
+
+findByAgeGreaterThan(int age)
+findByAgeLessThan(int age)
+
+findByNameAndCountry(String name, String country)
+findByNameOrCountry(String name, String country)
+
+findByNameContaining(String text)
+findByNameStartingWith(String text)
+
+findByOrderByNameAsc()
+findByOrderByNameDesc()
+
+// other keywords
+findBy...
+countBy...
+existsBy...
+deleteBy...
+
+And
+Or
+LessThan
+GreaterThan
+Containing
+OrderBy
+Asc / Desc
+
+List<User> findByCountryAndAgeGreaterThan(String country, int age);
+repository.findByCountryAndAgeGreaterThan("Latvia", 18);
+// SQL query
+SELECT *
+FROM users
+WHERE country = 'Latvia'
+  AND age > 18;
+
+// Optional - uswer with id 5 might not exist
+Optional<User> user = repository.findById(5L);
+```
+
+### roles
+```
+@PreAuthorize("hasRole('ADMIN')")
+@DeleteMapping("/users/{id}")
+public void deleteUser(@PathVariable Long id) {
+    service.deleteUser(id);
+}
+```
+### security filter chain
+```
+http.authorizeHttpRequests(auth -> auth
+    .requestMatchers("/public/**").permitAll()
+    .requestMatchers("/admin/**").hasRole("ADMIN")
+    .anyRequest().authenticated()
+);
+```
